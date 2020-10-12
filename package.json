@@ -1,0 +1,22 @@
+{
+  "name": "sales-customer-api",
+  "version": "1.0.0",
+  "description": "Basic api with Node, Apollo and graphQL",
+  "main": "index.js",
+  "scripts": {
+    "start": "node .",
+    "dev": "nodemon ."
+  },
+  "author": "Luis Antonio Mendoza Martinez",
+  "license": "ISC",
+  "dependencies": {
+    "apollo-server": "^2.18.2",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^8.2.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.10.9"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
+}
