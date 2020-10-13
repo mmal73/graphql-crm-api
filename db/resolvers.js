@@ -14,6 +14,13 @@ const resolvers = {
     Query: {
         getUser: async (_, { token }) => {
             return await jwt.verify(token, process.env.SECRET_WORD);
+        },
+        getProducts: async () => {
+            try {
+                return await productModel.find({});
+            } catch (error) {
+                throw new Error(error);
+            }
         }
     },
     Mutation: {
@@ -69,7 +76,7 @@ const resolvers = {
             } catch (error) {
                 throw new Error(error);
             }
-            
+
         },
     }
 };
