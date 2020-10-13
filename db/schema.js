@@ -34,7 +34,11 @@ const typeDefs = gql`
         price: Float!
     }
     type Query{
+        # Users
         getUser(token: String!): User
+        
+        # Products
+        getProducts: [Product]
     }
     type Mutation{
         # Users
