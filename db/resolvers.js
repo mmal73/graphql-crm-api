@@ -3,6 +3,7 @@ const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const userModel = require('../models/User');
 const productModel = require('../models/Product');
+const clientModel = require('../models/Client');
 
 const createToken = (user, word, expiration) =>{
     const {id, email, name, lastname} = user;
@@ -56,6 +57,7 @@ const resolvers = {
             }
 
         },
+        
         authenticateUser: async (_, { input })=>{
             // Destructuring input
             const { email, password } = input;
@@ -78,6 +80,7 @@ const resolvers = {
             }
 
         },
+        
         newProduct: async (_, {input}) => {
             try{
                 const product = new productModel(input);
@@ -87,6 +90,7 @@ const resolvers = {
             }
 
         },
+        
         updateProduct: async (_, { id, input }) => {
             // Check if the product exist
             const existProduct = productModel.findById(id);
@@ -95,6 +99,7 @@ const resolvers = {
             }
             return await productModel.findOneAndUpdate( { _id: id }, input, { new: true } );
         },
+        
         deleteProduct: async (_, { id, input }) => {
             // Check if the product exist
             const existProduct = productModel.findById(id);
@@ -104,6 +109,24 @@ const resolvers = {
             
             await productModel.findOneAndDelete( { _id: id } );
             return "Product removed";
+        },
+        
+        newClient: async (_, { input }, ctx) => {
+            // Check if the client exist
+            const { email } = input;
+            const existClient = await clientModel.findOne({email});
+            
+            if( existClient ){
+                throw new Error('Client exist');
+            }
+
+            try {
+                const newClient = new clientModel(input);
+                newClient.seller = ctx.currentUser.id
+                return await newClient.save();
+            } catch (error) {
+                throw new Error(error);
+            }
         }
     }
 };
