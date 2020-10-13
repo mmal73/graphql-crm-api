@@ -88,11 +88,22 @@ const resolvers = {
 
         },
         updateProduct: async (_, { id, input }) => {
+            // Check if the product exist
             const existProduct = productModel.findById(id);
             if( !existProduct ){
                 throw new Error('Product does not exist');
             }
             return await productModel.findOneAndUpdate( { _id: id }, input, { new: true } );
+        },
+        deleteProduct: async (_, { id, input }) => {
+            // Check if the product exist
+            const existProduct = productModel.findById(id);
+            if( !existProduct ){
+                throw new Error('Product does not exist');
+            }
+            
+            await productModel.findOneAndDelete( { _id: id } );
+            return "Product removed";
         }
     }
 };
