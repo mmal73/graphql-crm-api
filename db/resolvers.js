@@ -15,12 +15,21 @@ const resolvers = {
         getUser: async (_, { token }) => {
             return await jwt.verify(token, process.env.SECRET_WORD);
         },
+
         getProducts: async () => {
             try {
                 return await productModel.find({});
             } catch (error) {
                 throw new Error(error);
             }
+        },
+
+        getProduct: async (_, { id }) => {
+            const existProduct = productModel.findById(id);
+            if( !existProduct ){
+                throw new Error('Product does not exist');
+            }
+            return existProduct;
         }
     },
     Mutation: {
