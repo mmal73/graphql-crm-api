@@ -159,6 +159,19 @@ const resolvers = {
             } catch (error) {
                 throw new Error(error);
             }
+        },
+
+        updateClient: async ( _, { id, input }, ctx ) => {
+            // Check if exist the client
+            const existClient = await clientModel.findById( id );
+            if( !existClient ){
+                throw new Error('Client does not exist');
+            }
+            // Who created it can see it
+            if( existClient.seller.toString() !== ctx.currentUser.id ){
+                throw new Error("Can't you see it");
+            }
+            return await clientModel.findOneAndUpdate( { _id: id }, input, { new: true } );
         }
     }
 };
