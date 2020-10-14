@@ -172,6 +172,20 @@ const resolvers = {
                 throw new Error("Can't you see it");
             }
             return await clientModel.findOneAndUpdate( { _id: id }, input, { new: true } );
+        },
+
+        deleteClient: async ( _, { id }, ctx  ) => {
+            // Check if exist the client
+            const existClient = await clientModel.findById( id );
+            if( !existClient ){
+                throw new Error('Client does not exist');
+            }
+            // Who created it can see it
+            if( existClient.seller.toString() !== ctx.currentUser.id ){
+                throw new Error("Can't you see it");
+            }
+            await clientModel.findOneAndDelete( { _id: id } );
+            return "Client removed";
         }
     }
 };
