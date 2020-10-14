@@ -39,6 +39,15 @@ const resolvers = {
             } catch (error) {
                 throw new Error(error);
             }
+        },
+
+        getSellerClients: async ( _, {}, ctx) => {
+            try {
+                console.log(ctx)
+                return await clientModel.find( { seller: ctx.currentUser.id } );
+            } catch (error) {
+                throw new Error(error);
+            }
         }
     },
     Mutation: {
@@ -120,6 +129,7 @@ const resolvers = {
         },
         
         newClient: async (_, { input }, ctx) => {
+            console.log(ctx)
             // Check if the client exist
             const { email } = input;
             const existClient = await clientModel.findOne({email});
