@@ -44,10 +44,25 @@ const resolvers = {
         getSellerClients: async ( _, {}, ctx) => {
             try {
                 console.log(ctx)
-                return await clientModel.find( { seller: ctx.currentUser.id } );
+                return await clientModel.find( { seller: ctx.currentUser.id.toString() } );
             } catch (error) {
                 throw new Error(error);
             }
+        },
+
+        getClient: async ( _, { id }, ctx ) => {
+            // Check if client exist
+            const clientExist = await clientModel.findById(id);
+            if( !clientExist ){
+                throw new Error('The client does not exist');
+            }
+            // Who created it can see it
+            console.log(clientExist)
+            console.log(ctx.currentUser)
+            if( clientExist.seller.toString() !== ctx.currentUser.id ){
+                throw new Error("Can't you see it");
+            }
+            return clientExist;
         }
     },
     Mutation: {
@@ -129,7 +144,6 @@ const resolvers = {
         },
         
         newClient: async (_, { input }, ctx) => {
-            console.log(ctx)
             // Check if the client exist
             const { email } = input;
             const existClient = await clientModel.findOne({email});
@@ -140,7 +154,7 @@ const resolvers = {
 
             try {
                 const newClient = new clientModel(input);
-                newClient.seller = ctx.currentUser.id
+                newClient.seller = ctx.currentUser.id.toString()
                 return await newClient.save();
             } catch (error) {
                 throw new Error(error);
