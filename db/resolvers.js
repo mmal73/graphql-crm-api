@@ -31,6 +31,14 @@ const resolvers = {
                 throw new Error('Product does not exist');
             }
             return existProduct;
+        },
+
+        getClients: async () => {
+            try {
+                return await clientModel.find({});
+            } catch (error) {
+                throw new Error(error);
+            }
         }
     },
     Mutation: {
