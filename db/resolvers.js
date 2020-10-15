@@ -80,6 +80,21 @@ const resolvers = {
             } catch (error) {
                 throw new Error(error);
             }
+        },
+
+        getOrder: async (_, { id }, ctx) => {
+            try {
+                const existOrder = await orderModel.findById(id);
+                if( !existOrder ){
+                    throw new Error('Order does not exist');
+                }
+                if( existOrder.seller.toString() !== ctx.currentUser.id ){
+                    throw new Error("Can't you see it");
+                }
+                return existOrder;
+            } catch (error) {
+                throw new Error(error);
+            }
         }
     },
     Mutation: {
