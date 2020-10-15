@@ -64,6 +64,14 @@ const resolvers = {
                 throw new Error("Can't you see it");
             }
             return clientExist;
+        },
+
+        getOrders: async () => {
+            try {
+                return await orderModel.find({});
+            } catch (error) {
+                throw new Error(error);
+            }
         }
     },
     Mutation: {
