@@ -104,6 +104,31 @@ const resolvers = {
             } catch (error) {
                 throw new Error(error);
             }
+        },
+
+        bestClients: async ( _, {}, ctx ) => {
+            try {
+                const clients = await orderModel.aggregate([
+                    { $match: { status: "COMPLETED" } },
+                    { 
+                        $group: {
+                            _id: "$client",
+                            total: { $sum: '$total' }
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: 'clients',
+                            localField: '_id',
+                            foreignField: "_id",
+                            as: "client"
+                        }
+                    }
+                ]);
+                return clients;
+            } catch (error) {
+                throw new Error(error);
+            }
         }
     },
     Mutation: {
