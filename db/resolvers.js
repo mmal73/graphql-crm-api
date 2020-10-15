@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const userModel = require('../models/User');
 const productModel = require('../models/Product');
 const clientModel = require('../models/Client');
+const orderModel = require('../models/Order');
 
 const createToken = (user, word, expiration) =>{
     const {id, email, name, lastname} = user;
@@ -186,6 +187,38 @@ const resolvers = {
             }
             await clientModel.findOneAndDelete( { _id: id } );
             return "Client removed";
+        },
+        // Orders
+        newOrder: async ( _, { id, input },  ctx) => {
+            const { client } = input;
+            // Check if exist the client
+            const existClient = await clientModel.findById( client );
+            if( !existClient ){
+                throw new Error('Client does not exist');
+            }
+            // Who created it can see it
+            if( existClient.seller.toString() !== ctx.currentUser.id ){
+                throw new Error("Can't you see it");
+            }
+            // Check stock of product
+            
+            for await ( const article of input.order){
+                const { id, quantity } = article;
+                const findProduct = await productModel.findById(id);
+                if( findProduct.stock < quantity ){
+                    throw new Error(`No quantity available for ${findProduct.name}`);
+                }else{
+                    findProduct.stock = findProduct.stock - quantity;
+                    await findProduct.save();
+                }
+            }
+            
+            // Create order
+            const newOrder = new orderModel(input);
+            // Assign seller
+            newOrder.seller = ctx.currentUser.id;
+            // Save in database
+            return await newOrder.save();
         }
     }
 };
