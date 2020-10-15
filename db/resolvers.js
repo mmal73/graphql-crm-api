@@ -278,6 +278,19 @@ const resolvers = {
                 }
             }
             return await orderModel.findOneAndUpdate( { _id: id }, input, { new: true } );
+        },
+
+        deleteOrder: async ( _, { id }, ctx) => {
+            const existOrder = await orderModel.findById(id);
+            if( !existOrder ){
+                throw new Error('Order does not exist');
+            }
+            // if client belongs to the seller
+            if( existOrder.seller.toString() !== ctx.currentUser.id ){
+                throw new Error("Can't you see it");
+            }
+            await orderModel.findOneAndDelete( { _id: id } );
+            return 'Order deleted';
         }
     }
 };
