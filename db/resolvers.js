@@ -96,6 +96,14 @@ const resolvers = {
             } catch (error) {
                 throw new Error(error);
             }
+        },
+
+        getOrdersForStatus: async ( _, { status }, ctx ) => {
+            try {
+                return await orderModel.find( { seller: ctx.currentUser.id, status } );
+            } catch (error) {
+                throw new Error(error);
+            }
         }
     },
     Mutation: {
