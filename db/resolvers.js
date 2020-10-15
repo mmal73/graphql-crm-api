@@ -72,6 +72,14 @@ const resolvers = {
             } catch (error) {
                 throw new Error(error);
             }
+        },
+
+        getSellerOrders: async (_, {}, ctx) => {
+            try {
+                return await orderModel.find({ seller: ctx.currentUser.id});
+            } catch (error) {
+                throw new Error(error);
+            }
         }
     },
     Mutation: {
