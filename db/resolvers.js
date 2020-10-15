@@ -5,6 +5,7 @@ const userModel = require('../models/User');
 const productModel = require('../models/Product');
 const clientModel = require('../models/Client');
 const orderModel = require('../models/Order');
+const { findOneAndUpdate } = require('../models/User');
 
 const createToken = (user, word, expiration) =>{
     const {id, email, name, lastname} = user;
@@ -250,6 +251,33 @@ const resolvers = {
             newOrder.seller = ctx.currentUser.id;
             // Save in database
             return await newOrder.save();
+        },
+
+        updateOrder: async ( _, { id, input }, ctx) => {
+            const { client } = input;
+            const existOrder = await orderModel.findById(id);
+            if( !existOrder ){
+                throw new Error('Order does not exist');
+            }
+            const existClient = await clientModel.findById(client);
+            if( !existClient ){
+                throw new Error('Client does not exist');
+            }
+            // if client belongs to the seller
+            if( existClient.seller.toString() !== ctx.currentUser.id ){
+                throw new Error("Can't you see it");
+            }
+            for await ( const article of input.order){
+                const { quantity } = article;
+                const findProduct = await productModel.findById(article.id);
+                if( findProduct.stock < quantity ){
+                    throw new Error(`No quantity available for ${findProduct.name}`);
+                }else{
+                    findProduct.stock = findProduct.stock - quantity;
+                    await findProduct.save();
+                }
+            }
+            return await orderModel.findOneAndUpdate( { _id: id }, input, { new: true } );
         }
     }
 };
