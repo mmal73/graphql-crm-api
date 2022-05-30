@@ -6,6 +6,7 @@ const productModel = require('../models/Product');
 const clientModel = require('../models/Client');
 const orderModel = require('../models/Order');
 const { findOneAndUpdate } = require('../models/User');
+const Product = require('../models/Product');
 
 const createToken = (user, word, expiration) => {
   const { id, email, name, lastname } = user;
@@ -163,6 +164,10 @@ const resolvers = {
       } catch (error) {
         throw new Error(error);
       }
+    },
+    searchProduct: async (_, { text }) => {
+      const products = await Product.find({ $text: { $search: text } });
+      return products;
     },
   },
   Mutation: {

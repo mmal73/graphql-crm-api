@@ -50,10 +50,10 @@ const typeDefs = gql`
     seller: [User]
   }
   input UserInput {
-    name: String
-    lastname: String
-    email: String
-    password: String
+    name: String!
+    lastname: String!
+    email: String!
+    password: String!
   }
   input authenticateInput {
     email: String!
@@ -108,6 +108,7 @@ const typeDefs = gql`
     # Advanced searches
     bestClients: [TopClient]
     bestSellers: [TopSeller]
+    searchProduct(text: String!): [Product]
   }
   type Mutation {
     # Users
