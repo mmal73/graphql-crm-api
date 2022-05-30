@@ -1,129 +1,134 @@
 const { gql } = require('apollo-server');
 
 const typeDefs = gql`
-    type User{
-        id: ID
-        name: String
-        lastname: String
-        email: String
-        created_at: String
-    }
-    type Token{
-        token: String
-    }
-    type Product{
-        id: ID
-        name: String!
-        stock: Int!
-        price: Float!
-        created_at: String
-    }
-    type Client{
-        id: ID
-        name: String!
-        lastname: String!
-        company: String!
-        email: String!
-        phone: String
-        seller: ID
-        created_at: String!
-    }
-    type OrderGroup{
-        id: ID # id of product
-        quantity: Int
-    }
-    type Order{
-        id: ID
-        order: [OrderGroup]
-        total: Float
-        client: ID
-        seller: ID
-        created_at: String
-        status: statusOrder
-    }
-    type TopClient{
-        total: Float
-        client: [Client]
-    }
-    input UserInput{
-        name: String
-        lastname: String
-        email: String
-        password: String
-    }
-    input authenticateInput{
-        email: String!
-        password: String!
-    }
-    input ProductInput{
-        name: String!
-        stock: Int!
-        price: Float!
-    }
-    input ClientInput{
-        name: String!
-        lastname: String!
-        company: String!
-        email: String!
-        phone: String
-    }
-    input OrderProductInput{
-        id: ID! # id of product
-        quantity: Int
-    }
-    input OrderInput{
-        order: [OrderProductInput]
-        total: Float
-        client: ID
-        status: statusOrder
-    }
-    enum statusOrder{
-        PENDING
-        COMPLETED
-        CANCELLED
-    }
-    type Query{
-        # Users
-        getUser( token: String! ): User
-        
-        # Products
-        getProducts: [Product]
-        getProduct( id: ID! ): Product
+  type User {
+    id: ID
+    name: String
+    lastname: String
+    email: String
+    created_at: String
+  }
+  type Token {
+    token: String
+  }
+  type Product {
+    id: ID
+    name: String!
+    stock: Int!
+    price: Float!
+    created_at: String
+  }
+  type Client {
+    id: ID
+    name: String!
+    lastname: String!
+    company: String!
+    email: String!
+    phone: String
+    seller: ID
+    created_at: String!
+  }
+  type OrderGroup {
+    id: ID # id of product
+    quantity: Int
+  }
+  type Order {
+    id: ID
+    order: [OrderGroup]
+    total: Float
+    client: ID
+    seller: ID
+    created_at: String
+    status: statusOrder
+  }
+  type TopClient {
+    total: Float
+    client: [Client]
+  }
+  type TopSeller {
+    total: Float
+    seller: [User]
+  }
+  input UserInput {
+    name: String
+    lastname: String
+    email: String
+    password: String
+  }
+  input authenticateInput {
+    email: String!
+    password: String!
+  }
+  input ProductInput {
+    name: String!
+    stock: Int!
+    price: Float!
+  }
+  input ClientInput {
+    name: String!
+    lastname: String!
+    company: String!
+    email: String!
+    phone: String
+  }
+  input OrderProductInput {
+    id: ID! # id of product
+    quantity: Int
+  }
+  input OrderInput {
+    order: [OrderProductInput]
+    total: Float
+    client: ID
+    status: statusOrder
+  }
+  enum statusOrder {
+    PENDING
+    COMPLETED
+    CANCELLED
+  }
+  type Query {
+    # Users
+    getUser(token: String!): User
 
-        # Clients
-        getClients: [Client]
-        getSellerClients: [Client]
-        getClient( id: ID! ): Client
+    # Products
+    getProducts: [Product]
+    getProduct(id: ID!): Product
 
-        # Orders
-        getOrders: [Order]
-        getSellerOrders: [Order]
-        getOrder( id: ID! ): Order
-        getOrdersForStatus( status: String! ): [Order]
+    # Clients
+    getClients: [Client]
+    getSellerClients: [Client]
+    getClient(id: ID!): Client
 
-        # Advanced searches
-        bestClients: [TopClient]
-    }
-    type Mutation{
-        # Users
-        newUser( input: UserInput ): User
-        authenticateUser( input: authenticateInput ): Token
+    # Orders
+    getOrders: [Order]
+    getSellerOrders: [Order]
+    getOrder(id: ID!): Order
+    getOrdersForStatus(status: String!): [Order]
 
-        # Products
-        newProduct( input: ProductInput ): Product
-        updateProduct( id: ID!, input: ProductInput! ): Product
-        deleteProduct( id: ID! ): String
+    # Advanced searches
+    bestClients: [TopClient]
+    bestSellers: [TopSeller]
+  }
+  type Mutation {
+    # Users
+    newUser(input: UserInput): User
+    authenticateUser(input: authenticateInput): Token
 
-        # Clients
-        newClient( input: ClientInput ): Client
-        updateClient( id: ID!, input: ClientInput! ): Client
-        deleteClient( id: ID! ): String
+    # Products
+    newProduct(input: ProductInput): Product
+    updateProduct(id: ID!, input: ProductInput!): Product
+    deleteProduct(id: ID!): String
 
-        # Oders
-        newOrder( input: OrderInput ): Order
-        updateOrder( id: ID!, input: OrderInput ): Order
-        deleteOrder( id: ID! ): String
-    }
+    # Clients
+    newClient(input: ClientInput): Client
+    updateClient(id: ID!, input: ClientInput!): Client
+    deleteClient(id: ID!): String
+
+    # Oders
+    newOrder(input: OrderInput): Order
+    updateOrder(id: ID!, input: OrderInput): Order
+    deleteOrder(id: ID!): String
+  }
 `;
 
 module.exports = typeDefs;
