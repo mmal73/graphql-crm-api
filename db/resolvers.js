@@ -18,8 +18,10 @@ const createToken = (user, word, expiration) => {
 
 const resolvers = {
   Query: {
-    getUser: async (_, { token }) => {
-      return await jwt.verify(token, process.env.SECRET_WORD);
+    getUser: async (_, {}, ctx) => {
+      const { currentUser } = ctx;
+      if (!currentUser) throw new Error('Unauthenticated');
+      return currentUser;
     },
 
     getProducts: async () => {
