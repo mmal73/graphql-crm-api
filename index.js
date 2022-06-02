@@ -1,4 +1,4 @@
-const { ApolloServer } = require('apollo-server');
+const { ApolloServer, AuthenticationError } = require('apollo-server');
 const typeDefs = require('./db/schema');
 const resolvers = require('./db/resolvers');
 const jwt = require('jsonwebtoken');
@@ -23,7 +23,7 @@ const apolloServer = new ApolloServer({
           currentUser,
         };
       } catch (error) {
-        throw new Error(error);
+        throw new AuthenticationError('Session expired');
       }
     }
   },
