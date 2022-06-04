@@ -56,7 +56,6 @@ const resolvers = {
 
     getSellerClients: async (_, {}, ctx) => {
       try {
-        console.log(ctx);
         return await clientModel.find({
           seller: ctx.currentUser.id.toString(),
         });
@@ -72,8 +71,6 @@ const resolvers = {
         throw new Error('The client does not exist');
       }
       // Who created it can see it
-      console.log(clientExist);
-      console.log(ctx.currentUser);
       if (clientExist.seller.toString() !== ctx.currentUser.id) {
         throw new Error("Can't you see it");
       }
@@ -82,7 +79,8 @@ const resolvers = {
 
     getOrders: async () => {
       try {
-        return await orderModel.find({});
+        const allOrders = await orderModel.find({}).populate('client');
+        return allOrders;
       } catch (error) {
         throw new Error(error);
       }
@@ -90,7 +88,10 @@ const resolvers = {
 
     getSellerOrders: async (_, {}, ctx) => {
       try {
-        return await orderModel.find({ seller: ctx.currentUser.id });
+        const sellerOrders = await orderModel
+          .find({ seller: ctx.currentUser.id })
+          .populate('client');
+        return sellerOrders;
       } catch (error) {
         throw new Error(error);
       }
