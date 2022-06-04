@@ -8,6 +8,12 @@ const orderModel = require('../models/Order');
 const { findOneAndUpdate } = require('../models/User');
 const Product = require('../models/Product');
 
+const status = {
+  CANCELED: 'CANCELED',
+  PENDING: 'PENDING',
+  COMPLETED: 'COMPLETED',
+};
+
 const createToken = (user, word, expiration) => {
   const { id, email, name, lastname } = user;
 
@@ -116,7 +122,7 @@ const resolvers = {
     bestClients: async (_, {}, ctx) => {
       try {
         const clients = await orderModel.aggregate([
-          { $match: { status: 'COMPLETED' } },
+          { $match: { status: status.COMPLETED } },
           {
             $group: {
               _id: '$client',
@@ -140,7 +146,7 @@ const resolvers = {
     bestSellers: async (_, {}, ctx) => {
       try {
         const sellers = await orderModel.aggregate([
-          { $match: { status: 'COMPLETED' } },
+          { $match: { status: status.COMPLETED } },
           {
             $group: {
               _id: '$seller',
