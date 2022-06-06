@@ -352,7 +352,8 @@ const resolvers = {
       if (existClient.seller.toString() !== ctx.currentUser.id) {
         throw new Error("Can't you see it");
       }
-      for await (const article of input.order) {
+      const order = input.order || [];
+      for await (const article of order) {
         const { quantity } = article;
         const findProduct = await productModel.findById(article.id);
         if (findProduct.stock < quantity) {
