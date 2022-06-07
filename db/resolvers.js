@@ -22,15 +22,20 @@ const createToken = (user, word, expiration) => {
   });
 };
 
+const authUser = (ctx) => {
+  const { currentUser } = ctx;
+  if (!currentUser) throw new Error('Unauthenticated');
+  return currentUser;
+};
+
 const resolvers = {
   Query: {
     getUser: async (_, {}, ctx) => {
-      const { currentUser } = ctx;
-      if (!currentUser) throw new Error('Unauthenticated');
-      return currentUser;
+      return authUser(ctx);
     },
 
     getProducts: async () => {
+      authUser(ctx);
       try {
         return await productModel.find({});
       } catch (error) {
@@ -39,6 +44,7 @@ const resolvers = {
     },
 
     getProduct: async (_, { id }) => {
+      authUser(ctx);
       const existProduct = productModel.findById(id);
       if (!existProduct) {
         throw new Error('Product does not exist');
@@ -47,6 +53,7 @@ const resolvers = {
     },
 
     getClients: async (_, {}, ctx) => {
+      authUser(ctx);
       try {
         return await clientModel.find({ seller: ctx.currentUser.id });
       } catch (error) {
@@ -55,6 +62,7 @@ const resolvers = {
     },
 
     getSellerClients: async (_, {}, ctx) => {
+      authUser(ctx);
       try {
         return await clientModel.find({
           seller: ctx.currentUser.id.toString(),
@@ -65,6 +73,7 @@ const resolvers = {
     },
 
     getClient: async (_, { id }, ctx) => {
+      authUser(ctx);
       // Check if client exist
       const clientExist = await clientModel.findById(id);
       if (!clientExist) {
@@ -78,6 +87,7 @@ const resolvers = {
     },
 
     getOrders: async (_, {}, ctx) => {
+      authUser(ctx);
       try {
         const allOrders = await orderModel
           .find({ seller: ctx.currentUser.id })
@@ -89,6 +99,7 @@ const resolvers = {
     },
 
     getSellerOrders: async (_, {}, ctx) => {
+      authUser(ctx);
       try {
         const sellerOrders = await orderModel
           .find({ seller: ctx.currentUser.id })
@@ -100,6 +111,7 @@ const resolvers = {
     },
 
     getOrder: async (_, { id }, ctx) => {
+      authUser(ctx);
       try {
         const existOrder = await orderModel.findById(id);
         if (!existOrder) {
@@ -115,6 +127,7 @@ const resolvers = {
     },
 
     getOrdersForStatus: async (_, { status }, ctx) => {
+      authUser(ctx);
       try {
         return await orderModel.find({ seller: ctx.currentUser.id, status });
       } catch (error) {
@@ -123,6 +136,7 @@ const resolvers = {
     },
 
     bestClients: async (_, {}, ctx) => {
+      authUser(ctx);
       try {
         const clients = await orderModel.aggregate([
           { $match: { status: status.COMPLETED } },
@@ -147,6 +161,7 @@ const resolvers = {
       }
     },
     bestSellers: async (_, {}, ctx) => {
+      authUser(ctx);
       try {
         const sellers = await orderModel.aggregate([
           { $match: { status: status.COMPLETED } },
@@ -177,12 +192,13 @@ const resolvers = {
       }
     },
     searchProduct: async (_, { text }) => {
+      authUser(ctx);
       const products = await Product.find({ $text: { $search: text } });
       return products;
     },
   },
   Mutation: {
-    newUser: async (_, { input }) => {
+    newUser: async (_, { input }, ctx) => {
       // Destructuring input
       const { email, password } = input;
 
@@ -205,7 +221,7 @@ const resolvers = {
       }
     },
 
-    authenticateUser: async (_, { input }) => {
+    authenticateUser: async (_, { input }, ctx) => {
       // Destructuring input
       const { email, password } = input;
 
@@ -230,7 +246,8 @@ const resolvers = {
       };
     },
 
-    newProduct: async (_, { input }) => {
+    newProduct: async (_, { input }, ctx) => {
+      authUser(ctx);
       try {
         const product = new productModel(input);
         return product.save();
@@ -239,7 +256,8 @@ const resolvers = {
       }
     },
 
-    updateProduct: async (_, { id, input }) => {
+    updateProduct: async (_, { id, input }, ctx) => {
+      authUser(ctx);
       // Check if the product exist
       const existProduct = productModel.findById(id);
       if (!existProduct) {
@@ -250,7 +268,8 @@ const resolvers = {
       });
     },
 
-    deleteProduct: async (_, { id, input }) => {
+    deleteProduct: async (_, { id, input }, ctx) => {
+      authUser(ctx);
       // Check if the product exist
       const existProduct = productModel.findById(id);
       if (!existProduct) {
@@ -262,6 +281,7 @@ const resolvers = {
     },
 
     newClient: async (_, { input }, ctx) => {
+      authUser(ctx);
       // Check if the client exist
       const { email } = input;
       const existClient = await clientModel.findOne({ email });
@@ -280,6 +300,7 @@ const resolvers = {
     },
 
     updateClient: async (_, { id, input }, ctx) => {
+      authUser(ctx);
       // Check if exist the client
       const existClient = await clientModel.findById(id);
       if (!existClient) {
@@ -295,6 +316,7 @@ const resolvers = {
     },
 
     deleteClient: async (_, { id }, ctx) => {
+      authUser(ctx);
       // Check if exist the client
       const existClient = await clientModel.findById(id);
       if (!existClient) {
@@ -309,6 +331,7 @@ const resolvers = {
     },
     // Orders
     newOrder: async (_, { id, input }, ctx) => {
+      authUser(ctx);
       const { client } = input;
       // Check if exist the client
       const existClient = await clientModel.findById(client);
@@ -341,6 +364,7 @@ const resolvers = {
     },
 
     updateOrder: async (_, { id, input }, ctx) => {
+      authUser(ctx);
       const { client } = input;
       const existOrder = await orderModel.findById(id);
       if (!existOrder) {
@@ -371,6 +395,7 @@ const resolvers = {
     },
 
     deleteOrder: async (_, { id }, ctx) => {
+      authUser(ctx);
       const existOrder = await orderModel.findById(id);
       if (!existOrder) {
         throw new Error('Order does not exist');
