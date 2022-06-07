@@ -34,7 +34,7 @@ const resolvers = {
       return authUser(ctx);
     },
 
-    getProducts: async () => {
+    getProducts: async (_, {}, ctx) => {
       authUser(ctx);
       try {
         return await productModel.find({});
@@ -198,7 +198,7 @@ const resolvers = {
     },
   },
   Mutation: {
-    newUser: async (_, { input }, ctx) => {
+    newUser: async (_, { input }) => {
       // Destructuring input
       const { email, password } = input;
 
@@ -221,7 +221,7 @@ const resolvers = {
       }
     },
 
-    authenticateUser: async (_, { input }, ctx) => {
+    authenticateUser: async (_, { input }) => {
       // Destructuring input
       const { email, password } = input;
 
@@ -268,7 +268,7 @@ const resolvers = {
       });
     },
 
-    deleteProduct: async (_, { id, input }, ctx) => {
+    deleteProduct: async (_, { id }, ctx) => {
       authUser(ctx);
       // Check if the product exist
       const existProduct = productModel.findById(id);
@@ -330,7 +330,7 @@ const resolvers = {
       return 'Client removed';
     },
     // Orders
-    newOrder: async (_, { id, input }, ctx) => {
+    newOrder: async (_, { input }, ctx) => {
       authUser(ctx);
       const { client } = input;
       // Check if exist the client
