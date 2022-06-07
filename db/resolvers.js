@@ -46,9 +46,9 @@ const resolvers = {
       return existProduct;
     },
 
-    getClients: async () => {
+    getClients: async (_, {}, ctx) => {
       try {
-        return await clientModel.find({});
+        return await clientModel.find({ seller: ctx.currentUser.id });
       } catch (error) {
         throw new Error(error);
       }
@@ -77,9 +77,11 @@ const resolvers = {
       return clientExist;
     },
 
-    getOrders: async () => {
+    getOrders: async (_, {}, ctx) => {
       try {
-        const allOrders = await orderModel.find({}).populate('client');
+        const allOrders = await orderModel
+          .find({ seller: ctx.currentUser.id })
+          .populate('client');
         return allOrders;
       } catch (error) {
         throw new Error(error);
